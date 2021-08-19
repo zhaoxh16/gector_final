@@ -151,14 +151,17 @@ class Electra(modules.Module):
         state = self.encode(features)
         logits = self.classify(state)
         label_seq = labels["label"]
-        label_mask = labels["label_mask"]
+        correct_mask = labels['correct_mask'].to(torch.float32)
+        incorrect_mask = labels['incorrect_mask'].to(torch.float32)
         loss = self.criterion(logits, label_seq)
-        mask = label_mask.to(torch.float32)
 
         if loss.dtype == torch.float16:
             loss = loss.to(torch.float32)
 
-        return (torch.sum(loss * mask) / torch.sum(mask)).to(logits)
+        correct_loss = (torch.sum(loss * correct_mask) / torch.sum(correct_mask)).to(logits)
+        incorrect_loss = (torch.sum(loss * incorrect_mask) / torch.sum(incorrect_mask)).to(logits)
+
+        return correct_loss + incorrect_loss
 
     @staticmethod
     def masking_bias(mask, inf=-1e9, dtype=None):

@@ -48,10 +48,14 @@ def lookup(inputs, mode, params, to_cpu=False):
         label = labels['label'].numpy()
         src_mask = torch.FloatTensor(features["source_mask"].numpy())
         label_mask = torch.FloatTensor(labels["label_mask"].numpy())
+        correct_mask = torch.FloatTensor(labels["correct_mask"].numpy())
+        incorrect_mask = torch.FloatTensor(labels["incorrect_mask"].numpy())
 
         if not to_cpu:
             src_mask = src_mask.cuda()
             label_mask = label_mask.cuda()
+            correct_mask = correct_mask.cuda()
+            incorrect_mask = incorrect_mask.cuda()
 
         source = _lookup(source, params.lookup["source"], to_cpu=to_cpu)
         label = _lookup(label, params.lookup["label"], to_cpu=to_cpu)
@@ -63,7 +67,9 @@ def lookup(inputs, mode, params, to_cpu=False):
         
         labels = {
             "label": label,
-            "label_mask": label_mask
+            "label_mask": label_mask,
+            "correct_mask": correct_mask,
+            "incorrect_mask": incorrect_mask
         }
 
         return features, labels
