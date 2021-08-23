@@ -227,7 +227,6 @@ def main(args):
         iterator = iter(dataset)
         counter = 0
         pad_max = 512
-        top_beams = params.top_beams
         decode_batch_size = params.decode_batch_size
 
         # Buffers for synchronization

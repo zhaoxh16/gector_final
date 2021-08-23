@@ -226,7 +226,7 @@ def _evaluate_model_bert(model, sorted_key, dataset, references, params):
             restored_results_correct_length = []
             for i in range(len(restored_results)):
                 label_length = len(references[i])
-                restored_results_correct_length.append(restored_results[i][1:1+label_length])
+                restored_results_correct_length.append(restored_results[i][:label_length])
             
             return f_score(restored_results_correct_length, references)
 

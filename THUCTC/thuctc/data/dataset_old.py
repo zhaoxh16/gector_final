@@ -54,12 +54,11 @@ def build_input_fn(filenames, mode, params):
                     axis=0
                 ),
                 tf.concat(
-                    [y, [tf.constant(params.label_pad)]],
-                    axis=0
-                )
-            ),
-            num_parallel_calls=tf.data.experimental.AUTOTUNE
-        )
+                    [y,
+                     [tf.constant(params.label_pad)]],
+                    axis=0)
+                ),
+                num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
         dataset = dataset.map(
             lambda x, y: (
@@ -111,8 +110,7 @@ def build_input_fn(filenames, mode, params):
         #             "label": params.label_pad,
         #             "label_length": 0
         #         }),
-        #     pad_to_bucket_boundary=False
-        # )
+        #     pad_to_bucket_boundary=False)
 
         dataset = dataset.filter(valid_size)
         # dataset = dataset.apply(transformation_fn)
@@ -136,7 +134,7 @@ def build_input_fn(filenames, mode, params):
                     "label": params.label_pad,
                     "label_length": 0
                 }),
-        )
+            )
 
         dataset = dataset.map(
             lambda x, y: (
@@ -148,13 +146,15 @@ def build_input_fn(filenames, mode, params):
                 },
                 {
                     "label": y["label"],
-                    "label_mask": tf.sequence_mask(y["label_length"] - 1,
-                                                   tf.shape(y["label"])[1],
-                                                   tf.float32)
+                    "label_mask": tf.concat([
+                        (tf.zeros([tf.shape(y["label"])[0], 1])),
+                        tf.sequence_mask(y["label_length"] - 2,
+                                         tf.shape(y["label"])[1] - 1,
+                                         tf.float32)
+                    ], axis=1)
                 }
             ),
-            num_parallel_calls=tf.data.experimental.AUTOTUNE
-        )
+            num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
         return dataset
 
@@ -175,64 +175,45 @@ def build_input_fn(filenames, mode, params):
     #     # Append BOS and EOS
     #     dataset = dataset.map(
     #         lambda x, y:(
-    #             tf.concat(
-    #                 [[tf.constant(params.bos)], x, [tf.constant(params.eos)]],
-    #                 axis=0
-    #             ),
+    #             tf.concat([[tf.constant(params.bos)], x[1:], [tf.constant(params.eos)]], axis=0),
     #             tf.concat([y, [tf.constant(params.label_pad)]], axis=0)),
-    #             num_parallel_calls=tf.data.experimental.AUTOTUNE
-    #         )
+    #             num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
     #     dataset = dataset.map(
     #         lambda x, y: (
     #             {"source": x, "source_length": tf.shape(x)[0]}, 
     #             {"label": y, "label_length": tf.shape(y)[0]},
     #         ),
-    #         num_parallel_calls=tf.data.experimental.AUTOTUNE
-    #     )
+    #         num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
     #     # Batching
     #     dataset = dataset.padded_batch(
     #         params.decode_batch_size,
-    #         padded_shapes=(
-    #             {
+    #         padded_shapes=({
     #                 "source": tf.TensorShape([None]),
     #                 "source_length": tf.TensorShape([])
-    #             },
-    #             {
+    #             }, {
     #                 "label": tf.TensorShape([None]),
     #                 "label_length": tf.TensorShape([])
-    #             }
-    #         ),
-    #         padding_values=(
-    #             {
+    #             }),
+    #         padding_values=({
     #                 "source": params.pad,
     #                 "source_length": 0
-    #             },
-    #             {
+    #             }, {
     #                 "label": params.label_pad,
     #                 "label_length": 0
-    #             }
+    #             })
     #         )
-    #     )
 
     #     dataset = dataset.map(
-    #         lambda x, y: (
-    #             {
-    #                 "source": x["source"],
-    #                 "source_mask": tf.sequence_mask(x["source_length"],
-    #                                                 tf.shape(x["source"])[1],
-    #                                                 tf.float32)
-    #             },
-    #             {
-    #                 "label": y["label"],
-    #                 "label_mask": tf.sequence_mask(y["label_length"] - 1,
-    #                                                tf.shape(y["label"])[1],
-    #                                                tf.float32)
-    #             }
-    #         ),
-    #         num_parallel_calls=tf.data.experimental.AUTOTUNE
-    #     )
+    #         lambda x, y: ({
+    #             "source": x["source"],
+    #             "source_mask": tf.sequence_mask(x["source_length"], tf.shape(x["source"])[1], tf.float32)
+    #         }, {
+    #             "label": y["label"],
+    #             "label_mask": tf.concat([(tf.zeros([tf.shape(y["label"])[0], 1])), tf.sequence_mask(y["label_length"]-2, tf.shape(y["label"])[1]-1, tf.float32)], axis=1)
+    #         }),
+    #         num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
     #     return dataset
 
@@ -280,12 +261,12 @@ def build_input_fn(filenames, mode, params):
 
     if mode == "train":
         return train_input_fn
-    # if mode == "eval":
+    # elif mode == "eval":
     #     return eval_input_fn
     elif mode == "infer":
         return infer_input_fn
     else:
-        raise ValueError("Unknown mode {}".format(mode))
+        raise ValueError("Unknown mode %s" % mode)
 
 
 def get_dataset(filenames, mode, params):
