@@ -42,6 +42,7 @@ def load_vocabulary(filename):
 
 
 def lookup(inputs, mode, params, to_cpu=False):
+    src_unk_idx = params.lookup['source'][params.unk.encode('utf-8')]
     if mode != "infer":
         features, labels = inputs
         source = features["source"].numpy()
@@ -54,6 +55,7 @@ def lookup(inputs, mode, params, to_cpu=False):
             label_mask = label_mask.cuda()
 
         source = _lookup(source, params.lookup["source"], to_cpu=to_cpu)
+        lbl_unk_idx = params.lookup['label'][params.label_unk.encode('utf-8')]
         label = _lookup(label, params.lookup["label"], to_cpu=to_cpu)
 
         features = {

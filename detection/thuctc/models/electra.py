@@ -187,6 +187,7 @@ class Electra(modules.Module):
             bos="[CLS]",
             eos="[SEP]",
             unk="[UNK]",
+            label_unk="@@UNKNOWN@@",
             label_pad="@@PADDING@@",
             class_num=2,
             embedding_size=1024,

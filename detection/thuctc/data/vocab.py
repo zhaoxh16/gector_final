@@ -9,14 +9,14 @@ import torch
 import numpy as np
 
 
-def _lookup(x, vocab, to_cpu=False):
+def _lookup(x, vocab, unk_id, to_cpu=False):
     x = x.tolist()
     y = []
 
     for _, batch in enumerate(x):
         ids = []
         for _, v in enumerate(batch):
-            ids.append(vocab[v] if v in vocab else 2)
+            ids.append(vocab[v] if v in vocab else unk_id)
         y.append(ids)
 
     if to_cpu:
@@ -42,6 +42,7 @@ def load_vocabulary(filename):
 
 
 def lookup(inputs, mode, params, to_cpu=False):
+    src_unk_idx = params.lookup['source'][params.unk.encode('utf-8')]
     if mode != "infer":
         features, labels = inputs
         source = features["source"].numpy()
@@ -54,6 +55,8 @@ def lookup(inputs, mode, params, to_cpu=False):
             label_mask = label_mask.cuda()
 
         source = _lookup(source, params.lookup["source"], to_cpu=to_cpu)
+
+        lbl_unk_idx = params.lookup['label'][params.label_unk.encode('utf-8')]
         label = _lookup(label, params.lookup["label"], to_cpu=to_cpu)
 
         features = {
