@@ -298,5 +298,7 @@ def argmax_encoding(model, features, params):
     encoder_state = model.encode(features)
     logits, d_logits = model.classify(encoder_state)
     log_prob = torch.nn.functional.log_softmax(logits, dim=-1)
+    log_prob[:, :, params.keep_idx] += params.additional_confidence
     values, indices = torch.max(log_prob, -1)
+    # indices[values < params.min_error_probability] = params.keep_idx
     return values, indices

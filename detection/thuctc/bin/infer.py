@@ -79,6 +79,8 @@ def default_params():
         decode_ratio=1.0,
         decode_length=50,
         decode_batch_size=32,
+        additional_confidence=0.0,
+        min_error_probability=0.0,
     )
 
     return params
@@ -134,6 +136,7 @@ def override_params(params, args):
     }
 
     params.class_num = len(tgt_vocab)
+    params.keep_idx = params.lookup['label'][b'$KEEP']
 
     return params
 

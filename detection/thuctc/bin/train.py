@@ -130,6 +130,8 @@ def default_params():
         decode_length=50,
         validation="",
         references="",
+        
+        additional_confidence=0.0,
     )
 
     return params
@@ -207,6 +209,7 @@ def override_params(params, args):
     }
 
     params.class_num = len(tgt_vocab)
+    params.keep_idx = params.lookup['label'][b'$KEEP']
 
     return params
 
