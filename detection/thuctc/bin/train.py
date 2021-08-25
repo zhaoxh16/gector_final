@@ -419,6 +419,7 @@ def main(args):
                                 rank=args.local_rank,
                                 world_size=len(params.device_list))
         torch.cuda.set_device(params.device_list[args.local_rank])
+        print(args.local_rank, torch.cuda.current_device())
         torch.set_default_tensor_type(torch.cuda.FloatTensor)
 
     # Export parameters
@@ -502,7 +503,6 @@ def main(args):
             counter += 1
             t = time.time()
             features = data.lookup(features, "train", params)
-            print("features", dist.get_rank(), features[0]['source'].device)
             loss = train_fn(features)
             gradients = optimizer.compute_gradients(loss,
                                                     list(model.parameters()))

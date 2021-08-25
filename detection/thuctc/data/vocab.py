@@ -23,7 +23,7 @@ def _lookup(x, vocab, unk_id, to_cpu=False):
     if to_cpu:
         return torch.LongTensor(np.array(y, dtype="int32"))
 
-    return torch.LongTensor(np.array(y, dtype="int32")).cuda(dist.get_rank())
+    return torch.LongTensor(np.array(y, dtype="int32")).cuda()
 
 
 def load_vocabulary(filename):
@@ -52,8 +52,8 @@ def lookup(inputs, mode, params, to_cpu=False):
         label_mask = torch.FloatTensor(labels["label_mask"].numpy())
 
         if not to_cpu:
-            src_mask = src_mask.cuda(dist.get_rank())
-            label_mask = label_mask.cuda(dist.get_rank())
+            src_mask = src_mask.cuda()
+            label_mask = label_mask.cuda()
 
         source = _lookup(source, params.lookup["source"], src_unk_idx, to_cpu=to_cpu)
 
