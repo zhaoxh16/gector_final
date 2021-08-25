@@ -494,7 +494,6 @@ def main(args):
     while True:
         # summary.scalar("epoch", epoch, step, write_every_n_steps=1)
         for features in dataset:
-            print("3", args.local_rank, torch.cuda.current_device())
             if counter % params.update_cycle == 0:
                 step += 1
                 utils.set_global_step(step)
