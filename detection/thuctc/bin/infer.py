@@ -226,6 +226,7 @@ def main(args):
             mode = "eval"
             dataset = data.get_dataset(args.input, mode, params)
             sorted_key = None
+        torch.cuda.set_device(params.device_list[args.local_rank])
 
         iterator = iter(dataset)
         counter = 0
