@@ -469,7 +469,6 @@ def main(args):
 
         # Load pre-trained models
         state = torch.load(args.checkpoint, map_location="cpu")
-        print("1.2", args.local_rank, torch.cuda.current_device())
         model.load_state_dict(state["model"], strict=False)
         step = params.initial_step
     else:
