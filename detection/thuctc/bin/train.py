@@ -452,6 +452,7 @@ def main(args):
     trainable_flags = print_variables(model, params.pattern,
                                       dist.get_rank() == 0)
 
+    print(args.local_rank, torch.cuda.current_device())
     dataset = data.get_dataset(params.input, "train", params)
 
     if params.validation:
@@ -476,6 +477,7 @@ def main(args):
         logging.warning("The pre-trained model is required.")
         step = 0
         broadcast(model)
+    print(args.local_rank, torch.cuda.current_device())
 
     # save the initialized model
     # save_checkpoint(step, epoch, model, optimizer, params)
@@ -493,6 +495,7 @@ def main(args):
     while True:
         # summary.scalar("epoch", epoch, step, write_every_n_steps=1)
         for features in dataset:
+            print(args.local_rank, torch.cuda.current_device())
             if counter % params.update_cycle == 0:
                 step += 1
                 utils.set_global_step(step)
