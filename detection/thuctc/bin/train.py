@@ -452,8 +452,8 @@ def main(args):
     trainable_flags = print_variables(model, params.pattern,
                                       dist.get_rank() == 0)
 
-    print("1", args.local_rank, torch.cuda.current_device())
     dataset = data.get_dataset(params.input, "train", params)
+    print("1", args.local_rank, torch.cuda.current_device())
 
     if params.validation:
         sorted_key, eval_dataset = data.get_dataset(
@@ -463,6 +463,7 @@ def main(args):
         sorted_key = None
         eval_dataset = None
         references = None
+    print("1.1", args.local_rank, torch.cuda.current_device())
 
     if args.checkpoint is not None:
         logging.info("Loading the pre-trained model " \
@@ -470,6 +471,7 @@ def main(args):
 
         # Load pre-trained models
         state = torch.load(args.checkpoint, map_location="cpu")
+        print("1.2", args.local_rank, torch.cuda.current_device())
         model.load_state_dict(state["model"], strict=False)
         step = params.initial_step
     else:
