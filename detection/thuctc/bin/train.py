@@ -419,7 +419,6 @@ def main(args):
                                 rank=args.local_rank,
                                 world_size=len(params.device_list))
         torch.cuda.set_device(params.device_list[args.local_rank])
-        print(args.local_rank, torch.cuda.current_device())
         torch.set_default_tensor_type(torch.cuda.FloatTensor)
 
     # Export parameters
@@ -453,7 +452,7 @@ def main(args):
                                       dist.get_rank() == 0)
 
     dataset = data.get_dataset(params.input, "train", params)
-    print("1", args.local_rank, torch.cuda.current_device())
+    torch.cuda.set_device(params.device_list[args.local_rank])
 
     if params.validation:
         sorted_key, eval_dataset = data.get_dataset(
@@ -463,7 +462,6 @@ def main(args):
         sorted_key = None
         eval_dataset = None
         references = None
-    print("1.1", args.local_rank, torch.cuda.current_device())
 
     if args.checkpoint is not None:
         logging.info("Loading the pre-trained model " \
@@ -479,7 +477,6 @@ def main(args):
         logging.warning("The pre-trained model is required.")
         step = 0
         broadcast(model)
-    print("2", args.local_rank, torch.cuda.current_device())
 
     # save the initialized model
     # save_checkpoint(step, epoch, model, optimizer, params)
