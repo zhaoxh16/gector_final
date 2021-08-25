@@ -502,7 +502,7 @@ def main(args):
             counter += 1
             t = time.time()
             features = data.lookup(features, "train", params)
-            print("features", dist.get_rank(), features[0].device)
+            print("features", dist.get_rank(), features[0]['source'].device)
             loss = train_fn(features)
             gradients = optimizer.compute_gradients(loss,
                                                     list(model.parameters()))
